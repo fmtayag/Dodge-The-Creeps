@@ -4,22 +4,33 @@ extends Node
 var score
 
 func _ready():
-	new_game()
+	#new_game()
+	pass
 
 func _process(delta):
 	pass
 
+func new_game():
+	get_tree().call_group("mobs", "queue_free")
+	score = 0
+	$Player.start($StartPosition.position)
+	$StartTimer.start()
+	
+	$HUD.update_score(score)
+	$HUD.show_message("Get Ready")
+	
+	$Music.play()
+	
 
 func game_over():
 	$ScoreTimer.stop()
 	$MobTimer.stop()	
 	
-func new_game():
-	score = 0
-	$Player.start($StartPosition.position)
-	$StartTimer.start()
-
-
+	$HUD.show_game_over()
+	
+	$DeathSound.play()
+	$Music.stop()
+	
 func _on_mob_timer_timeout():
 	# Create a new instance of the Mob scene.
 	var mob = mob_scene.instantiate()
@@ -48,7 +59,8 @@ func _on_mob_timer_timeout():
 
 func _on_score_timer_timeout():
 	score += 1
-
+	
+	$HUD.update_score(score)
 
 func _on_start_timer_timeout():
 	$MobTimer.start()
